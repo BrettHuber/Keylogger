@@ -8,6 +8,6 @@ Create .env file and added the following lines to the file:
     export DISCORD_WEBHOOK = "Insert Webhook URL"
     export PHONE_NUMBER = "Insert AT&T Phone Number (ex: 9731234567)". 
     export SKYPE_CHANNEL = "Insert Skype Channel ID (ex: 94:numbersletters@thread.skype)"
-Replace Insert-Token with actual slack bot token retrieved from slack,, Insert Channel ID with channel retrieved from slack, Insert Webhook URL with discord webhook url, Insert AT&T Phone Number (ex: 9731234567) with actual phone number, Insert Skype Chanel ID with a skype channel id.
+Replace Insert-Token with actual slack bot token retrieved from slack,, Insert Channel ID with channel retrieved from slack, Insert Webhook URL with discord webhook url, Insert AT&T Phone Number (ex: 9731234567) with actual phone number, Insert Skype Chamnel ID with a skype channel id.
 
 ***By installing and/or utilizing this program, an agreement is made that the user accepts all responsibility.
